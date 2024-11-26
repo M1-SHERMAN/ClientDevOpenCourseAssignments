@@ -46,7 +46,8 @@ protected:
 	void OnRep_HitCounter();
 
 	UFUNCTION(Server, Reliable)
-	void ServerHandleHitEvent(AController* PlayerController);
+	void ServerHandleHit(AController* PlayerController);
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -54,5 +55,8 @@ public:
 	virtual int GetScoreValue() const override;
 
 	virtual void HandleHitEvent(AController* PlayerController) override;
+
+	UFUNCTION(BlueprintCallable, NetMulticast, Reliable)
+	void MulticastHandleHit(AController* PlayerController);
 
 };

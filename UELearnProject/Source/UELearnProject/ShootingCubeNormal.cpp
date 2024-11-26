@@ -3,4 +3,7 @@
 
 #include "ShootingCubeNormal.h"
 
-
+AShootingCubeNormal::AShootingCubeNormal()
+{
+	bReplicates = true;
+}

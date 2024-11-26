@@ -7,6 +7,7 @@
 #include "Logging/LogMacros.h"
 #include "UELearnProjectCharacter.generated.h"
 
+class AShootingCubeBase;
 class UInputComponent;
 class USkeletalMeshComponent;
 class UCameraComponent;
@@ -60,12 +61,15 @@ protected:
 	virtual void NotifyControllerChanged() override;
 	virtual void SetupPlayerInputComponent(UInputComponent* InputComponent) override;
 	// End of APawn interface
-
+	
 public:
 	/** Returns Mesh1P subobject **/
 	USkeletalMeshComponent* GetMesh1P() const { return Mesh1P; }
 	/** Returns FirstPersonCameraComponent subobject **/
 	UCameraComponent* GetFirstPersonCameraComponent() const { return FirstPersonCameraComponent; }
+
+	UFUNCTION(Server, Reliable)
+	void ServerReportHit(AShootingCubeBase* CubeOnHit);
 
 };
 

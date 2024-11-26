@@ -9,6 +9,7 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
+#include "ShootingCubeBase.h"
 #include "Engine/LocalPlayer.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
@@ -71,6 +72,14 @@ void AUELearnProjectCharacter::SetupPlayerInputComponent(UInputComponent* Player
 	else
 	{
 		UE_LOG(LogTemplateCharacter, Error, TEXT("'%s' Failed to find an Enhanced Input Component! This template is built to use the Enhanced Input system. If you intend to use the legacy system, then you will need to update this C++ file."), *GetNameSafe(this));
+	}
+}
+
+void AUELearnProjectCharacter::ServerReportHit_Implementation(AShootingCubeBase* CubeOnHit)
+{
+	if (CubeOnHit != nullptr)
+	{
+		CubeOnHit->MulticastHandleHit(Controller);
 	}
 }
 

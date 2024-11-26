@@ -26,6 +26,15 @@ protected:
 	void EndGame();
 
 	void UpdateGameTime();
+
+	UFUNCTION(BlueprintCallable, Category="Game Rules")
+	void GenerateCubes();
+private:
+	UPROPERTY(EditDefaultsOnly, Category="Cube Classes")
+	TSubclassOf<class AShootingCubeNormal> NormalCubeClass;
+
+	UPROPERTY(EditDefaultsOnly, Category="Cube Classes")
+	TSubclassOf<class AShootingCubeSpecial> SpecialCubeClass;
 };
 
 

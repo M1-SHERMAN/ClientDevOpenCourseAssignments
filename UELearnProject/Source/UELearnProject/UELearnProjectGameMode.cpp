@@ -2,8 +2,12 @@
 
 #include "UELearnProjectGameMode.h"
 #include "MyGameState.h"
-#include "GameFramework/PlayerState.h"
+#include "ShootingCubeSpecial.h"
+#include "ShootingCubeNormal.h"
 
+#include "Engine/TargetPoint.h"
+#include "GameFramework/PlayerState.h"
+#include "Kismet/GameplayStatics.h"
 #include "UObject/ConstructorHelpers.h"
 
 AUELearnProjectGameMode::AUELearnProjectGameMode()
@@ -15,6 +19,15 @@ AUELearnProjectGameMode::AUELearnProjectGameMode()
 	
 	GameStateClass = AMyGameState::StaticClass();
 
+
+	if (NormalCubeClass == nullptr)
+	{
+		NormalCubeClass = AShootingCubeNormal::StaticClass();
+	}
+	if (SpecialCubeClass == nullptr)
+	{
+		SpecialCubeClass = AShootingCubeSpecial::StaticClass();
+	}
 }
 
 
@@ -58,25 +71,46 @@ void AUELearnProjectGameMode::UpdateGameTime()
 	}
 }
 
+void AUELearnProjectGameMode::GenerateCubes()
+{
+	TArray<AActor*> TargetPoints;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ATargetPoint::StaticClass(), TargetPoints);
+
+	for (AActor* TargetPoint : TargetPoints)
+	{
+		if (ATargetPoint* TargetPointCasted = Cast<ATargetPoint>(TargetPoint))
+		{
+			TSubclassOf<AShootingCubeBase> CubeClass = FMath::RandBool() ? NormalCubeClass : SpecialCubeClass;
+
+			FVector Location = TargetPoint->GetActorLocation();
+			FRotator Rotation = TargetPoint->GetActorRotation();
+			
+			if (auto* Cube = GetWorld()->SpawnActor<AShootingCubeBase>(CubeClass, Location, Rotation))
+			{
+				Cube->SetReplicates(true);
+				Cube->SetReplicateMovement(true);
+				Cube->bAlwaysRelevant = true;
+			}
+		}
+	}
+}
+
 void AUELearnProjectGameMode::EndGame()
 {
 	GetWorld()->GetTimerManager().ClearTimer(GameTimerHandle);
 
-	if (AMyGameState * MyGameState = GetGameState<AMyGameState>())
+	if (const AMyGameState* MyGameState = GetGameState<AMyGameState>())
 	{
 		check(GEngine);
 		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("Game Over! Final Scores: "));
-
-		UE_LOG(LogTemp, Log, TEXT("=== Game Over! Debug Scores ==="));
-		UE_LOG(LogTemp, Log, TEXT("Number of Player Controllers: %d"), GetWorld()->GetNumPlayerControllers());
 		
 		for (auto It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
 		{
-			if (APlayerController* PlayerController = It->Get())
+			if (const APlayerController* PlayerController = It->Get())
 			{
-				if (APlayerState* PlayerState = PlayerController->GetPlayerState<APlayerState>())
+				if (const APlayerState* PlayerState = PlayerController->GetPlayerState<APlayerState>())
 				{
-					int32 Score = MyGameState->GetPlayerScore(PlayerState);
+					const int32 Score = MyGameState->GetPlayerScore(PlayerState);
 					check(GEngine);
 					GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::Printf(TEXT("Player: %s, Score: %d"), *PlayerState->GetPlayerName(), Score));
 				}
@@ -96,7 +130,6 @@ void AUELearnProjectGameMode::AddScore(const AController* PlayerController, int 
 {
 	if (!PlayerController)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("GameMode AddScore: PlayerController is null"));
 		return;
 	}
 
@@ -105,15 +138,6 @@ void AUELearnProjectGameMode::AddScore(const AController* PlayerController, int 
 		if (APlayerState* PlayerState = PlayerController->GetPlayerState<APlayerState>())
 		{
 			MyGameState->AddPlayerScore(PlayerState, Score);
-			UE_LOG(LogTemp, Warning, TEXT("GameMode adding score %d to player %s"), Score, *PlayerState->GetPlayerName());
 		}
-		else
-		{
-			UE_LOG(LogTemp, Warning, TEXT("GameMode AddScore: PlayerState is null"));
-		}
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("GameMode AddScore: GameState is null"));
 	}
 }

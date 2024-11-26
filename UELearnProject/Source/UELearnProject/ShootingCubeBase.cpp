@@ -1,6 +1,8 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "ShootingCubeBase.h"
+
+#include "UELearnProjectCharacter.h"
 #include "UELearnProjectGameMode.h"
 #include "Net/UnrealNetwork.h"
 #include "Components/BoxComponent.h"
@@ -31,6 +33,8 @@ AShootingCubeBase::AShootingCubeBase()
 	{
 		CubeMesh->SetMaterial(0, CubeMaterialAsset.Object);
 	}
+
+	bReplicates = true;
 }
 
 // Called when the game starts or when spawned
@@ -60,69 +64,47 @@ int AShootingCubeBase::GetScoreValue() const
 
 void AShootingCubeBase::HandleHitEvent(AController* PlayerController)
 {
-	if (HasAuthority())
+	if (PlayerController)
 	{
-		ServerHandleHitEvent(PlayerController);
-	}
-	else
-	{
-		ServerHandleHitEvent(PlayerController);
+		
+		if (APawn* Pawn = PlayerController->GetPawn())
+		{
+			if (AUELearnProjectCharacter* Character = Cast<AUELearnProjectCharacter>(Pawn))
+			{
+				Character->ServerReportHit(this);
+			}
+		}
 	}
 }
 
-void AShootingCubeBase::ServerHandleHitEvent_Implementation(AController* PlayerController)
+void AShootingCubeBase::ServerHandleHit_Implementation(AController* PlayerController)
 {
-	if (!HasAuthority())
-	{
-		return;
-	}
+	MulticastHandleHit(PlayerController);
+}
+
+void AShootingCubeBase::MulticastHandleHit_Implementation(AController* PlayerController)
+{
 
 	HitCounter++;
-
-	UE_LOG(LogTemp, Warning, TEXT("ServerHandleHit with Controller: %s"), 
-			PlayerController ? TEXT("Valid") : TEXT("Invalid"));
 	
 	if (HitCounter == 1)
 	{
 		SetActorScale3D(GetActorScale3D() * ScaledSize);
 		
-		if (!PlayerController)
-		{
-			UE_LOG(LogTemp, Error, TEXT("Hit with no valid InstigatorController!"));
-		}
-		
 		if (AUELearnProjectGameMode* GameMode = Cast<AUELearnProjectGameMode>(GetWorld()->GetAuthGameMode()))
 		{
 			const int ScoreToAdd = GetScoreValue();
 			GameMode->AddScore(PlayerController, ScoreToAdd);
-			
-			UE_LOG(LogTemp, Warning, TEXT("Adding Score: %d, Controller: %s, GameMode: Valid"), 
-						ScoreToAdd,
-						PlayerController ? TEXT("Valid") : TEXT("Invalid"));
-		}
-		else
-		{
-			UE_LOG(LogTemp, Error, TEXT("Hit with no valid GameMode!"));
+
 		}
 	}
 	else if (HitCounter == 2)
 	{
-		if (!PlayerController)
-		{
-			UE_LOG(LogTemp, Error, TEXT("Hit with no valid InstigatorController!"));
-		}
 		
 		if (AUELearnProjectGameMode* GameMode = Cast<AUELearnProjectGameMode>(GetWorld()->GetAuthGameMode()))
 		{
 			const int ScoreToAdd = GetScoreValue();
 			GameMode->AddScore(PlayerController, ScoreToAdd);
-			UE_LOG(LogTemp, Warning, TEXT("Adding Score: %d, Controller: %s, GameMode: Valid"), 
-			ScoreToAdd,
-			PlayerController ? TEXT("Valid") : TEXT("Invalid"));
-		}
-		else
-		{
-			UE_LOG(LogTemp, Error, TEXT("Hit with no valid GameMode!"));
 		}
 		
 		Destroy();

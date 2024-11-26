@@ -14,5 +14,7 @@ UCLASS()
 class UELEARNPROJECT_API AShootingCubeNormal : public AShootingCubeBase
 {
 	GENERATED_BODY()
+public:
+	AShootingCubeNormal();
 	
 };

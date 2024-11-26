@@ -32,6 +32,8 @@ AUELearnProjectProjectile::AUELearnProjectProjectile()
 
 	// Die after 3 seconds by default
 	InitialLifeSpan = 3.0f;
+
+	bReplicates = true;
 }
 
 void AUELearnProjectProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
@@ -42,6 +44,8 @@ void AUELearnProjectProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* Othe
 	{
 		Scorable->HandleHitEvent(OwningController);
 	}
+
+	Destroy();
 }
 
 void AUELearnProjectProjectile::SetOwningController(AController* Controller)

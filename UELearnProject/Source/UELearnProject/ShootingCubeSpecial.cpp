@@ -2,3 +2,8 @@
 
 
 #include "ShootingCubeSpecial.h"
+
+AShootingCubeSpecial::AShootingCubeSpecial()
+{
+	bReplicates = true;
+}

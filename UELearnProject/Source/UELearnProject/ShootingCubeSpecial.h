@@ -14,7 +14,8 @@ UCLASS()
 class UELEARNPROJECT_API AShootingCubeSpecial : public AShootingCubeBase
 {
 	GENERATED_BODY()
-	
+public:
+	AShootingCubeSpecial();
 protected:
 	virtual int GetScoreValue() const override
 	{
