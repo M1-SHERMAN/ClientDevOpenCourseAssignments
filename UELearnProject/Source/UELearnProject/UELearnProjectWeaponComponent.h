@@ -47,8 +47,14 @@ public:
 
 	/** Make the weapon Fire a Projectile */
 	UFUNCTION(BlueprintCallable, Category="Weapon")
-	void Fire();
+	void HandleFire();
 
+	// UFUNCTION(Server, Reliable)
+	// void ServerFire();
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastHandleFire(APlayerController* PlayerController);
+	
 protected:
 	/** Ends gameplay for this component. */
 	UFUNCTION()
@@ -56,5 +62,5 @@ protected:
 
 private:
 	/** The Character holding this weapon*/
-	AUELearnProjectCharacter* Character;
+	TObjectPtr<AUELearnProjectCharacter> Character;
 };

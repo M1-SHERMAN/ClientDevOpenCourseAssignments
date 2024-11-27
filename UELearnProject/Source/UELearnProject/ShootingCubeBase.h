@@ -30,6 +30,8 @@ protected:
 	TObjectPtr<UStaticMeshComponent> CubeMesh;
 
 protected:
+	// 使用ReplicatedUsing标记，当HitCounter属性更新时，调用OnRep_HitCounter函数
+	// 确保客户端和服务器的HitCounter属性同步
 	UPROPERTY(ReplicatedUsing = OnRep_HitCounter, BlueprintReadOnly, Category="Scores")
 	int HitCounter = 0;
 
@@ -45,9 +47,6 @@ protected:
 	UFUNCTION()
 	void OnRep_HitCounter();
 
-	UFUNCTION(Server, Reliable)
-	void ServerHandleHit(AController* PlayerController);
-
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -55,8 +54,8 @@ public:
 	virtual int GetScoreValue() const override;
 
 	virtual void HandleHitEvent(AController* PlayerController) override;
-
-	UFUNCTION(BlueprintCallable, NetMulticast, Reliable)
-	void MulticastHandleHit(AController* PlayerController);
+	
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastHandleHitEvent(AController* PlayerController);
 
 };

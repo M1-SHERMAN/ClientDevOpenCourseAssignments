@@ -13,11 +13,14 @@ class AUELearnProjectGameMode : public AGameModeBase
 public:
 	AUELearnProjectGameMode();
 
-	void AddScore(const AController* PlayerController, int Score) const;
+	void AddScore(const AController* PlayerController, int NewScore) const;
 	
 protected:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Game Rules")
-	float GameDuration = 300.0f;
+	UPROPERTY(BlueprintReadOnly, Category="Game Rules")
+	float GameDuration;
+
+	UPROPERTY(BlueprintReadOnly, Category="Game Rules")
+	int RemainingSpecialCubeNumber;
 
 	FTimerHandle GameTimerHandle;
 
@@ -29,7 +32,7 @@ protected:
 
 	UFUNCTION(BlueprintCallable, Category="Game Rules")
 	void GenerateCubes();
-private:
+	
 	UPROPERTY(EditDefaultsOnly, Category="Cube Classes")
 	TSubclassOf<class AShootingCubeNormal> NormalCubeClass;
 

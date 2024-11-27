@@ -18,7 +18,8 @@ AUELearnProjectGameMode::AUELearnProjectGameMode()
 	DefaultPawnClass = PlayerPawnClassFinder.Class;
 	
 	GameStateClass = AMyGameState::StaticClass();
-
+	GameDuration = GameStateClass->GetDefaultObject<AMyGameState>()->GetRemainingGameTime();
+	RemainingSpecialCubeNumber = GameStateClass->GetDefaultObject<AMyGameState>()->GetRemainingSpecialCube();
 
 	if (NormalCubeClass == nullptr)
 	{
@@ -28,6 +29,7 @@ AUELearnProjectGameMode::AUELearnProjectGameMode()
 	{
 		SpecialCubeClass = AShootingCubeSpecial::StaticClass();
 	}
+
 }
 
 
@@ -82,15 +84,29 @@ void AUELearnProjectGameMode::GenerateCubes()
 		{
 			TSubclassOf<AShootingCubeBase> CubeClass = FMath::RandBool() ? NormalCubeClass : SpecialCubeClass;
 
-			FVector Location = TargetPoint->GetActorLocation();
-			FRotator Rotation = TargetPoint->GetActorRotation();
-			
-			if (auto* Cube = GetWorld()->SpawnActor<AShootingCubeBase>(CubeClass, Location, Rotation))
+			if (CubeClass == SpecialCubeClass)
 			{
-				Cube->SetReplicates(true);
-				Cube->SetReplicateMovement(true);
-				Cube->bAlwaysRelevant = true;
+				UE_LOG(LogTemp, Warning, TEXT("Spawning Special Cube!"));
+				UE_LOG(LogTemp, Warning, TEXT("Remaining Special Cubes: %d"), RemainingSpecialCubeNumber);
+				if ( RemainingSpecialCubeNumber <= 0)
+				{
+					UE_LOG(LogTemp, Warning, TEXT("No more special cubes!"));
+					continue;
+				}
+				else
+				{
+					UE_LOG(LogTemp, Warning, TEXT("Decreasing special cubes Number"));
+					GameStateClass->GetDefaultObject<AMyGameState>()->SetRemainingSpecialCube(--RemainingSpecialCubeNumber);
+				}
 			}
+			
+			FVector Location = TargetPoint->GetActorLocation();
+			Location.Y += FMath::RandRange(-100.0f, 100.0f);
+			Location.Z += FMath::RandRange(-100.0f, 100.0f);
+			
+			FRotator Rotation = TargetPoint->GetActorRotation();
+			GetWorld()->SpawnActor<AShootingCubeBase>(CubeClass, Location, Rotation);
+			
 		}
 	}
 }
@@ -126,7 +142,7 @@ void AUELearnProjectGameMode::EndGame()
 	}
 }
 
-void AUELearnProjectGameMode::AddScore(const AController* PlayerController, int Score) const
+void AUELearnProjectGameMode::AddScore(const AController* PlayerController, int NewScore) const
 {
 	if (!PlayerController)
 	{
@@ -137,7 +153,7 @@ void AUELearnProjectGameMode::AddScore(const AController* PlayerController, int 
 	{
 		if (APlayerState* PlayerState = PlayerController->GetPlayerState<APlayerState>())
 		{
-			MyGameState->AddPlayerScore(PlayerState, Score);
+			MyGameState->AddPlayerScore(PlayerState, NewScore);
 		}
 	}
 }

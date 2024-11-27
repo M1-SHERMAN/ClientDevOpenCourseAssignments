@@ -18,34 +18,28 @@ UUELearnProjectWeaponComponent::UUELearnProjectWeaponComponent()
 {
 	// Default offset from the character location for projectiles to spawn
 	MuzzleOffset = FVector(100.0f, 0.0f, 10.0f);
+
+	
+	SetIsReplicated(true);
 }
 
-
-void UUELearnProjectWeaponComponent::Fire()
+void UUELearnProjectWeaponComponent::MulticastHandleFire_Implementation(APlayerController* PlayerController)
 {
-	if (Character == nullptr || Character->GetController() == nullptr)
-	{
-		return;
-	}
-
-	// Try and fire a projectile
+	UE_LOG(LogTemp, Warning, TEXT("WeaponComponent: MulticastHandleFire"));
 	if (ProjectileClass != nullptr)
 	{
-		UWorld* const World = GetWorld();
-		if (World != nullptr)
+		if (UWorld* const World = GetWorld())
 		{
-			APlayerController* PlayerController = Cast<APlayerController>(Character->GetController());
+			// APlayerController* PlayerController = Cast<APlayerController>(Character->GetController());
 			const FRotator SpawnRotation = PlayerController->PlayerCameraManager->GetCameraRotation();
-			// MuzzleOffset is in camera space, so transform it to world space before offsetting from the character location to find the final muzzle position
 			const FVector SpawnLocation = GetOwner()->GetActorLocation() + SpawnRotation.RotateVector(MuzzleOffset);
-	
-			//Set Spawn Collision Handling Override
+
 			FActorSpawnParameters ActorSpawnParams;
 			ActorSpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
-	
-			// Spawn the projectile at the muzzle
+			
 			AUELearnProjectProjectile* Projectile =
 				World->SpawnActor<AUELearnProjectProjectile>(ProjectileClass, SpawnLocation, SpawnRotation, ActorSpawnParams);
+
 			if (Projectile)
 			{
 				AController* OwningController = Character->GetController();
@@ -54,6 +48,20 @@ void UUELearnProjectWeaponComponent::Fire()
 		}
 	}
 	
+
+}
+
+
+void UUELearnProjectWeaponComponent::HandleFire()
+{
+	if (Character == nullptr || Character->GetController() == nullptr)
+	{
+		return;
+	}
+	
+	Character->ServerReportFire(this);
+
+	// 音效和动画可以直接在客户端播放，无需经过服务端验证
 	// Try and play the sound if specified
 	if (FireSound != nullptr)
 	{
@@ -85,7 +93,7 @@ bool UUELearnProjectWeaponComponent::AttachWeapon(AUELearnProjectCharacter* Targ
 	// Attach the weapon to the First Person Character
 	FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, true);
 	AttachToComponent(Character->GetMesh1P(), AttachmentRules, FName(TEXT("GripPoint")));
-
+	
 	// Set up action bindings
 	if (APlayerController* PlayerController = Cast<APlayerController>(Character->GetController()))
 	{
@@ -98,10 +106,10 @@ bool UUELearnProjectWeaponComponent::AttachWeapon(AUELearnProjectCharacter* Targ
 		if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerController->InputComponent))
 		{
 			// Fire
-			EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Triggered, this, &UUELearnProjectWeaponComponent::Fire);
+			EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Triggered, this, &UUELearnProjectWeaponComponent::HandleFire);
 		}
 	}
-
+	
 	return true;
 }
 

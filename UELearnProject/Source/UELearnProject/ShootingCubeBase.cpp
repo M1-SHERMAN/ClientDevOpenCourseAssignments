@@ -62,27 +62,22 @@ int AShootingCubeBase::GetScoreValue() const
 	return HitScore;
 }
 
-void AShootingCubeBase::HandleHitEvent(AController* PlayerController)
+void AShootingCubeBase::HandleHitEvent(AController* InstigatorController)
 {
-	if (PlayerController)
+	if (InstigatorController != nullptr)
 	{
-		
-		if (APawn* Pawn = PlayerController->GetPawn())
+		if (APawn* Pawn = InstigatorController->GetPawn())
 		{
 			if (AUELearnProjectCharacter* Character = Cast<AUELearnProjectCharacter>(Pawn))
 			{
+				// 获取玩家角色后，让玩家角色来调用服务器的 RPC 函数以处理击中事件
 				Character->ServerReportHit(this);
 			}
 		}
 	}
 }
 
-void AShootingCubeBase::ServerHandleHit_Implementation(AController* PlayerController)
-{
-	MulticastHandleHit(PlayerController);
-}
-
-void AShootingCubeBase::MulticastHandleHit_Implementation(AController* PlayerController)
+void AShootingCubeBase::MulticastHandleHitEvent_Implementation(AController* InstigatorController)
 {
 
 	HitCounter++;
@@ -94,7 +89,7 @@ void AShootingCubeBase::MulticastHandleHit_Implementation(AController* PlayerCon
 		if (AUELearnProjectGameMode* GameMode = Cast<AUELearnProjectGameMode>(GetWorld()->GetAuthGameMode()))
 		{
 			const int ScoreToAdd = GetScoreValue();
-			GameMode->AddScore(PlayerController, ScoreToAdd);
+			GameMode->AddScore(InstigatorController, ScoreToAdd);
 
 		}
 	}
@@ -104,7 +99,7 @@ void AShootingCubeBase::MulticastHandleHit_Implementation(AController* PlayerCon
 		if (AUELearnProjectGameMode* GameMode = Cast<AUELearnProjectGameMode>(GetWorld()->GetAuthGameMode()))
 		{
 			const int ScoreToAdd = GetScoreValue();
-			GameMode->AddScore(PlayerController, ScoreToAdd);
+			GameMode->AddScore(InstigatorController, ScoreToAdd);
 		}
 		
 		Destroy();

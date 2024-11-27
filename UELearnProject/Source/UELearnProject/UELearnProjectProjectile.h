@@ -21,7 +21,13 @@ class AUELearnProjectProjectile : public AActor
 	/** Projectile movement component */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Movement, meta = (AllowPrivateAccess = "true"))
 	UProjectileMovementComponent* ProjectileMovement;
+protected:
+	UPROPERTY(Replicated)
+	AUELearnProjectProjectile* Projectile;
 
+	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
+	
+	
 public:
 	AUELearnProjectProjectile();
 

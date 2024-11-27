@@ -2,6 +2,8 @@
 
 #include "UELearnProjectCharacter.h"
 #include "UELearnProjectProjectile.h"
+#include "UELearnProjectWeaponComponent.h"
+
 #include "Animation/AnimInstance.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
@@ -11,6 +13,7 @@
 #include "InputActionValue.h"
 #include "ShootingCubeBase.h"
 #include "Engine/LocalPlayer.h"
+#include "Net/UnrealNetwork.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
@@ -36,7 +39,16 @@ AUELearnProjectCharacter::AUELearnProjectCharacter()
 	Mesh1P->CastShadow = false;
 	Mesh1P->SetRelativeLocation(FVector(-30.f, 0.f, -150.f));
 
+	bReplicates = true;
 }
+
+void AUELearnProjectCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(AUELearnProjectCharacter, Character);
+}
+
 
 //////////////////////////////////////////////////////////////////////////// Input
 
@@ -75,11 +87,23 @@ void AUELearnProjectCharacter::SetupPlayerInputComponent(UInputComponent* Player
 	}
 }
 
+
+void AUELearnProjectCharacter::ServerReportFire_Implementation(UUELearnProjectWeaponComponent* WeaponComponent)
+{
+	if (WeaponComponent != nullptr)
+	{
+		if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
+		{
+			WeaponComponent->MulticastHandleFire(PlayerController);
+		}
+	}
+}
+
 void AUELearnProjectCharacter::ServerReportHit_Implementation(AShootingCubeBase* CubeOnHit)
 {
 	if (CubeOnHit != nullptr)
 	{
-		CubeOnHit->MulticastHandleHit(Controller);
+		CubeOnHit->MulticastHandleHitEvent(Controller);
 	}
 }
 

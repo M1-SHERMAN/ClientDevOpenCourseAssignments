@@ -6,12 +6,13 @@
 #include "UELearnProjectGameMode.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Components/SphereComponent.h"
+#include "Net/UnrealNetwork.h"
 
 AUELearnProjectProjectile::AUELearnProjectProjectile() 
 {
 	// Use a sphere as a simple collision representation
 	CollisionComp = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComp"));
-	CollisionComp->InitSphereRadius(5.0f);
+	CollisionComp->InitSphereRadius(3.0f);
 	CollisionComp->BodyInstance.SetCollisionProfileName("Projectile");
 	CollisionComp->OnComponentHit.AddDynamic(this, &AUELearnProjectProjectile::OnHit);		// set up a notification for when this component hits something blocking
 
@@ -34,6 +35,13 @@ AUELearnProjectProjectile::AUELearnProjectProjectile()
 	InitialLifeSpan = 3.0f;
 
 	bReplicates = true;
+}
+
+void AUELearnProjectProjectile::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(AUELearnProjectProjectile, Projectile);
 }
 
 void AUELearnProjectProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)

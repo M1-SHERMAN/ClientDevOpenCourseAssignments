@@ -7,6 +7,7 @@
 #include "Logging/LogMacros.h"
 #include "UELearnProjectCharacter.generated.h"
 
+class UUELearnProjectWeaponComponent;
 class AShootingCubeBase;
 class UInputComponent;
 class USkeletalMeshComponent;
@@ -25,6 +26,9 @@ class AUELearnProjectCharacter : public ACharacter
 	/** Pawn mesh: 1st person view (arms; seen only by self) */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Mesh, meta = (AllowPrivateAccess = "true"))
 	USkeletalMeshComponent* Mesh1P;
+
+	UPROPERTY(Replicated)
+	AUELearnProjectCharacter* Character;
 
 	/** First person camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
@@ -61,6 +65,8 @@ protected:
 	virtual void NotifyControllerChanged() override;
 	virtual void SetupPlayerInputComponent(UInputComponent* InputComponent) override;
 	// End of APawn interface
+
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	
 public:
 	/** Returns Mesh1P subobject **/
@@ -71,5 +77,7 @@ public:
 	UFUNCTION(Server, Reliable)
 	void ServerReportHit(AShootingCubeBase* CubeOnHit);
 
+	UFUNCTION(Server, Reliable)
+	void ServerReportFire(UUELearnProjectWeaponComponent* WeaponComponent);
 };
 
