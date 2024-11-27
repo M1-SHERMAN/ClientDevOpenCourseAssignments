@@ -38,16 +38,8 @@ AUELearnProjectCharacter::AUELearnProjectCharacter()
 	Mesh1P->bCastDynamicShadow = false;
 	Mesh1P->CastShadow = false;
 	Mesh1P->SetRelativeLocation(FVector(-30.f, 0.f, -150.f));
-
-	// bReplicates = true;
+	
 }
-
-// void AUELearnProjectCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
-// {
-// 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-//
-// 	DOREPLIFETIME(AUELearnProjectCharacter, Character);
-// }
 
 
 //////////////////////////////////////////////////////////////////////////// Input

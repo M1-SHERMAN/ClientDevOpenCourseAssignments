@@ -12,7 +12,7 @@ AUELearnProjectProjectile::AUELearnProjectProjectile()
 {
 	// Use a sphere as a simple collision representation
 	CollisionComp = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComp"));
-	CollisionComp->InitSphereRadius(3.0f);
+	CollisionComp->InitSphereRadius(0.5f);
 	CollisionComp->BodyInstance.SetCollisionProfileName("Projectile");
 	CollisionComp->OnComponentHit.AddDynamic(this, &AUELearnProjectProjectile::OnHit);		// set up a notification for when this component hits something blocking
 
@@ -26,13 +26,13 @@ AUELearnProjectProjectile::AUELearnProjectProjectile()
 	// Use a ProjectileMovementComponent to govern this projectile's movement
 	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileComp"));
 	ProjectileMovement->UpdatedComponent = CollisionComp;
-	ProjectileMovement->InitialSpeed = 3000.f;
-	ProjectileMovement->MaxSpeed = 3000.f;
+	ProjectileMovement->InitialSpeed = 15000.f;
+	ProjectileMovement->MaxSpeed = 15000.f;
 	ProjectileMovement->bRotationFollowsVelocity = true;
 	ProjectileMovement->bShouldBounce = true;
 
-	// Die after 3 seconds by default
-	InitialLifeSpan = 3.0f;
+	// Die after 1 seconds by default
+	InitialLifeSpan = 1.0f;
 
 	bReplicates = true;
 }
@@ -51,9 +51,8 @@ void AUELearnProjectProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* Othe
 	if (IScorable* Scorable = Cast<IScorable>(OtherActor))
 	{
 		Scorable->HandleHitEvent(OwningController);
+		Destroy();
 	}
-
-	Destroy();
 }
 
 void AUELearnProjectProjectile::SetOwningController(AController* Controller)

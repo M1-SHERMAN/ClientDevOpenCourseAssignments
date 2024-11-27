@@ -18,6 +18,7 @@ void AMyGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLife
 	// 这里一定要注意，这里设置的变量必须是在.h文件中使用Replicated标记的变量
 	DOREPLIFETIME(AMyGameState, PlayerScores);
 	DOREPLIFETIME(AMyGameState, RemainingGameTime);
+	DOREPLIFETIME(AMyGameState, RemainingSpecialCube);
 }
 
 FPlayerScoreInfo& AMyGameState::FindOrAddPlayerScore(const FString& PlayerId)

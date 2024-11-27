@@ -60,6 +60,8 @@ protected:
 public:
 	AMyGameState();
 
+	const TArray<FPlayerScoreInfo>& GetPlayerScoreInfo() const {return PlayerScores;};
+	
 	void AddPlayerScore(const APlayerState* PlayerState, int AddScore);
 	int GetPlayerScore(const APlayerState* PlayerState) const;
 	int GetTotalPlayerScore() const;

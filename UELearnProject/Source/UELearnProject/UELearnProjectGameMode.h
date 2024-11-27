@@ -20,6 +20,9 @@ protected:
 	float GameDuration;
 
 	UPROPERTY(BlueprintReadOnly, Category="Game Rules")
+	float RemainingGameTime;
+	
+	UPROPERTY(BlueprintReadOnly, Category="Game Rules")
 	int RemainingSpecialCubeNumber;
 
 	UPROPERTY(BlueprintReadOnly, Category="Game Rules")
