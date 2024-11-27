@@ -41,6 +41,11 @@ protected:
 
 	UPROPERTY(BlueprintReadWrite, ReplicatedUsing = OnRep_RemainingSpecialCube, Category="Game State")
 	int RemainingSpecialCube = 10;
+
+	// 设置Cube生成的范围
+	// 这里设置为(0, 1000, 1000)表示Cube将在X轴上的0到500的范围内生成
+	UPROPERTY(BlueprintReadWrite, Category="Game State")
+	FVector CubeSpawnRange = FVector(0.0f, 500.f, 500.f);
 	
 	UFUNCTION()
 	void OnRep_RemainingTime() const;
@@ -64,6 +69,8 @@ public:
 
 	void SetRemainingSpecialCube(int NewSpecialCube);
 	int GetRemainingSpecialCube() const {return RemainingSpecialCube;};
+
+	FVector GetCubeSpawnRange() const {return CubeSpawnRange;};
 	
 	// 定义一个委托，当RemainingGameTime变量发生变化时，会调用该委托
 	// 用于通知客户端游戏剩余时间的变化

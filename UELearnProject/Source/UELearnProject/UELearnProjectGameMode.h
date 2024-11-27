@@ -22,6 +22,9 @@ protected:
 	UPROPERTY(BlueprintReadOnly, Category="Game Rules")
 	int RemainingSpecialCubeNumber;
 
+	UPROPERTY(BlueprintReadOnly, Category="Game Rules")
+	FVector CubeSpawnRange;
+
 	FTimerHandle GameTimerHandle;
 
 	virtual void BeginPlay() override;

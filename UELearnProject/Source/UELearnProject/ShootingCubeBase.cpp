@@ -77,9 +77,8 @@ void AShootingCubeBase::HandleHitEvent(AController* InstigatorController)
 	}
 }
 
-void AShootingCubeBase::MulticastHandleHitEvent_Implementation(AController* InstigatorController)
+void AShootingCubeBase::ServerHandleHitEvent_Implementation(AController* InstigatorController)
 {
-
 	HitCounter++;
 	
 	if (HitCounter == 1)

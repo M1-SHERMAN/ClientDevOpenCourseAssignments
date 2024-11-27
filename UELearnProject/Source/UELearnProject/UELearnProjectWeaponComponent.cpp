@@ -19,18 +19,15 @@ UUELearnProjectWeaponComponent::UUELearnProjectWeaponComponent()
 	// Default offset from the character location for projectiles to spawn
 	MuzzleOffset = FVector(100.0f, 0.0f, 10.0f);
 
-	
 	SetIsReplicated(true);
 }
 
-void UUELearnProjectWeaponComponent::MulticastHandleFire_Implementation(APlayerController* PlayerController)
+void UUELearnProjectWeaponComponent::ServerHandleFire_Implementation(APlayerController* PlayerController)
 {
-	UE_LOG(LogTemp, Warning, TEXT("WeaponComponent: MulticastHandleFire"));
 	if (ProjectileClass != nullptr)
 	{
 		if (UWorld* const World = GetWorld())
 		{
-			// APlayerController* PlayerController = Cast<APlayerController>(Character->GetController());
 			const FRotator SpawnRotation = PlayerController->PlayerCameraManager->GetCameraRotation();
 			const FVector SpawnLocation = GetOwner()->GetActorLocation() + SpawnRotation.RotateVector(MuzzleOffset);
 
@@ -47,8 +44,6 @@ void UUELearnProjectWeaponComponent::MulticastHandleFire_Implementation(APlayerC
 			}
 		}
 	}
-	
-
 }
 
 
@@ -79,6 +74,8 @@ void UUELearnProjectWeaponComponent::HandleFire()
 		}
 	}
 }
+
+
 
 bool UUELearnProjectWeaponComponent::AttachWeapon(AUELearnProjectCharacter* TargetCharacter)
 {

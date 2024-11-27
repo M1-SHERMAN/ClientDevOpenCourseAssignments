@@ -55,7 +55,7 @@ public:
 
 	virtual void HandleHitEvent(AController* PlayerController) override;
 	
-	UFUNCTION(NetMulticast, Reliable)
-	void MulticastHandleHitEvent(AController* PlayerController);
+	UFUNCTION(Server, Reliable)
+	void ServerHandleHitEvent(AController* InstigatorController);
 
 };

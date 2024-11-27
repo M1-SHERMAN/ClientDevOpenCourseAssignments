@@ -46,7 +46,6 @@ void AMyGameState::AddPlayerScore(const APlayerState* PlayerState, int AddScore)
 	const FString PlayerId = FString::FromInt(PlayerState->GetPlayerId());
 
 	FPlayerScoreInfo& PlayerScore = FindOrAddPlayerScore(PlayerId);
-	// int OldScore = PlayerScore.Score;
 	PlayerScore.Score += AddScore;
 	
 	ForceNetUpdate();

@@ -52,8 +52,11 @@ public:
 	// UFUNCTION(Server, Reliable)
 	// void ServerFire();
 
-	UFUNCTION(NetMulticast, Reliable)
-	void MulticastHandleFire(APlayerController* PlayerController);
+	// UFUNCTION(NetMulticast, Reliable)
+	// void MulticastHandleFire(APlayerController* PlayerController);
+
+	UFUNCTION(Server, Reliable)
+	void ServerHandleFire(APlayerController* PlayerController);
 	
 protected:
 	/** Ends gameplay for this component. */

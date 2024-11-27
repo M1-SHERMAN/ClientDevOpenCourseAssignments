@@ -20,7 +20,9 @@ AUELearnProjectGameMode::AUELearnProjectGameMode()
 	GameStateClass = AMyGameState::StaticClass();
 	GameDuration = GameStateClass->GetDefaultObject<AMyGameState>()->GetRemainingGameTime();
 	RemainingSpecialCubeNumber = GameStateClass->GetDefaultObject<AMyGameState>()->GetRemainingSpecialCube();
+	CubeSpawnRange = GameStateClass->GetDefaultObject<AMyGameState>()->GetCubeSpawnRange();
 
+	
 	if (NormalCubeClass == nullptr)
 	{
 		NormalCubeClass = AShootingCubeNormal::StaticClass();
@@ -100,9 +102,28 @@ void AUELearnProjectGameMode::GenerateCubes()
 				}
 			}
 			
-			FVector Location = TargetPoint->GetActorLocation();
-			Location.Y += FMath::RandRange(-100.0f, 100.0f);
-			Location.Z += FMath::RandRange(-100.0f, 100.0f);
+			// FVector Location = TargetPoint->GetActorLocation();
+			// Location.Y += FMath::RandRange(-100.0f, 100.0f);
+			// Location.Z += FMath::RandRange(-100.0f, 100.0f);
+
+			FVector Location;
+			bool bLocationSpawned = false;
+			while (!bLocationSpawned)
+			{
+				Location = TargetPoint->GetActorLocation();
+				Location.Y += FMath::RandRange(-CubeSpawnRange.Y, CubeSpawnRange.Y);
+				Location.Z += FMath::RandRange(-CubeSpawnRange.Z, CubeSpawnRange.Z);
+
+				FCollisionQueryParams QueryParams;
+				QueryParams.AddIgnoredActor(TargetPoint);
+
+				bLocationSpawned = !GetWorld()->OverlapAnyTestByChannel(
+					Location,
+					FQuat::Identity,
+					ECollisionChannel::ECC_WorldStatic,
+					FCollisionShape::MakeBox(FVector(50.0f)),
+						QueryParams);
+			}
 			
 			FRotator Rotation = TargetPoint->GetActorRotation();
 			GetWorld()->SpawnActor<AShootingCubeBase>(CubeClass, Location, Rotation);
@@ -135,10 +156,6 @@ void AUELearnProjectGameMode::EndGame()
 		
 		int TotalScore = MyGameState->GetTotalPlayerScore();
 		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("Total Score: ") + FString::FromInt(TotalScore));
-		
-
-
-
 	}
 }
 

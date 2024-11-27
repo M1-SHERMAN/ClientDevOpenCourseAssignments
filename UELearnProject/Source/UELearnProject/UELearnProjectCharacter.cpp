@@ -39,15 +39,15 @@ AUELearnProjectCharacter::AUELearnProjectCharacter()
 	Mesh1P->CastShadow = false;
 	Mesh1P->SetRelativeLocation(FVector(-30.f, 0.f, -150.f));
 
-	bReplicates = true;
+	// bReplicates = true;
 }
 
-void AUELearnProjectCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
-{
-	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-
-	DOREPLIFETIME(AUELearnProjectCharacter, Character);
-}
+// void AUELearnProjectCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+// {
+// 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+//
+// 	DOREPLIFETIME(AUELearnProjectCharacter, Character);
+// }
 
 
 //////////////////////////////////////////////////////////////////////////// Input
@@ -88,25 +88,6 @@ void AUELearnProjectCharacter::SetupPlayerInputComponent(UInputComponent* Player
 }
 
 
-void AUELearnProjectCharacter::ServerReportFire_Implementation(UUELearnProjectWeaponComponent* WeaponComponent)
-{
-	if (WeaponComponent != nullptr)
-	{
-		if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
-		{
-			WeaponComponent->MulticastHandleFire(PlayerController);
-		}
-	}
-}
-
-void AUELearnProjectCharacter::ServerReportHit_Implementation(AShootingCubeBase* CubeOnHit)
-{
-	if (CubeOnHit != nullptr)
-	{
-		CubeOnHit->MulticastHandleHitEvent(Controller);
-	}
-}
-
 
 void AUELearnProjectCharacter::Move(const FInputActionValue& Value)
 {
@@ -131,5 +112,24 @@ void AUELearnProjectCharacter::Look(const FInputActionValue& Value)
 		// add yaw and pitch input to controller
 		AddControllerYawInput(LookAxisVector.X);
 		AddControllerPitchInput(LookAxisVector.Y);
+	}
+}
+
+void AUELearnProjectCharacter::ServerReportFire_Implementation(UUELearnProjectWeaponComponent* WeaponComponent)
+{
+	if (WeaponComponent != nullptr)
+	{
+		if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
+		{
+			WeaponComponent->ServerHandleFire(PlayerController);
+		}
+	}
+}
+
+void AUELearnProjectCharacter::ServerReportHit_Implementation(AShootingCubeBase* CubeOnHit)
+{
+	if (CubeOnHit != nullptr)
+	{
+		CubeOnHit->ServerHandleHitEvent(Controller);
 	}
 }
