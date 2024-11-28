@@ -1,6 +1,6 @@
 # 第二周作业：学习笔记 & 思路总结
 
-![](Video/Week02Video.mp4)
+![VideoLink](Video/Week02Video.mp4)
 
 # 学习笔记 & 思路整理
 
