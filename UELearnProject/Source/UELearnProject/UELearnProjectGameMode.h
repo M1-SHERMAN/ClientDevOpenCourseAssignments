@@ -29,12 +29,10 @@ protected:
 	FVector CubeSpawnRange;
 
 	FTimerHandle GameTimerHandle;
+	void UpdateGameTime();
 
 	virtual void BeginPlay() override;
-
-	void EndGame();
-
-	void UpdateGameTime();
+	
 
 	UFUNCTION(BlueprintCallable, Category="Game Rules")
 	void GenerateCubes();

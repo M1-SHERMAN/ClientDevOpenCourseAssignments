@@ -47,7 +47,8 @@ void AUELearnProjectProjectile::GetLifetimeReplicatedProps(TArray<class FLifetim
 void AUELearnProjectProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
 	if (!OtherActor || !HasAuthority()) return;
-	
+
+	// 如果碰撞到了带有IScorable接口的Actor，则调用HandleHitEvent函数，处理碰撞事件
 	if (IScorable* Scorable = Cast<IScorable>(OtherActor))
 	{
 		Scorable->HandleHitEvent(OwningController);

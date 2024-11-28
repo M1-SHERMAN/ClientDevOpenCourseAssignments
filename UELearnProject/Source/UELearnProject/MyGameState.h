@@ -4,15 +4,15 @@
 
 #include "MyGameState.generated.h"
 // 用来存储玩家的Id、分数信息
-USTRUCT()
+USTRUCT(BlueprintType)
 struct FPlayerScoreInfo
 {
 	GENERATED_BODY()
 
-	UPROPERTY()
+	UPROPERTY(BlueprintReadWrite)
 	FString PlayerId;
 
-	UPROPERTY()
+	UPROPERTY(BlueprintReadWrite)
 	int Score;
 
 	FPlayerScoreInfo()
@@ -69,14 +69,19 @@ protected:
 
 public:
 	AMyGameState();
-
+	
 	const TArray<FPlayerScoreInfo>& GetPlayerScoreInfo() const {return PlayerScores;};
+	UFUNCTION(BlueprintCallable, Category="Game State")
+	void GetPlayerScoreInfoToBluePrint(TArray<FPlayerScoreInfo>& OutPlayerScores) const {OutPlayerScores = PlayerScores;};
 
+	
 	int GetHitScore() const {return HitScore;};
 	float GetScaledSize() const {return ScaledSize;};
 	
 	void AddPlayerScore(const APlayerState* PlayerState, int AddScore);
 	int GetPlayerScore(const APlayerState* PlayerState) const;
+
+	UFUNCTION(BlueprintCallable, Category="Game State")
 	int GetTotalPlayerScore() const;
 
 	void SetRemainingGameTime(float NewTime);
@@ -87,8 +92,6 @@ public:
 
 	FVector GetCubeSpawnRange() const {return CubeSpawnRange;};
 	
-	// 定义一个委托，当RemainingGameTime变量发生变化时，会调用该委托
-	// 用于通知客户端游戏剩余时间的变化
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnTimeUpdated, float, NewTime);
 	UPROPERTY(BlueprintAssignable, Category="Game State")
 	FOnTimeUpdated OnTimeUpdated;
@@ -97,6 +100,15 @@ public:
 	UPROPERTY(BlueprintAssignable, Category="Game State")
 	FOnSpecialCubeUpdated OnSpecialCubeUpdated;
 
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnGameEnd);
+	UPROPERTY(BlueprintAssignable, Category="Game State")
+	FOnGameEnd OnGameEnd;
+
+	// 需要使用NetMultiCast，因为要确保所有客户端都能收到游戏结束的消息
+	// 当服务器调用MulticastEndGame时，该函数会在所有客户端上执行，处理游戏结束的逻辑
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastEndGame();
+	
 private:
 	void LoadConfig();
 

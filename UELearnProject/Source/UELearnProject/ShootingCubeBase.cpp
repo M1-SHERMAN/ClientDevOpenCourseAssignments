@@ -35,13 +35,7 @@ AShootingCubeBase::AShootingCubeBase()
 	{
 		CubeMesh->SetMaterial(0, CubeMaterialAsset.Object);
 	}
-
-	// if (const UClass* MyGameState = AMyGameState::StaticClass())
-	// {
-	// 	HitScore = MyGameState->GetDefaultObject<AMyGameState>()->GetHitScore();
-	// 	ScaledSize = MyGameState->GetDefaultObject<AMyGameState>()->GetScaledSize();
-	// }
-
+	
 	bReplicates = true;
 }
 
@@ -49,12 +43,6 @@ AShootingCubeBase::AShootingCubeBase()
 void AShootingCubeBase::BeginPlay()
 {
 	Super::BeginPlay();
-
-	// if (const AMyGameState* MyGameState = GetWorld()->GetGameStateChecked<AMyGameState>())
-	// {
-	// 	HitScore = MyGameState->GetHitScore();
-	// 	ScaledSize = MyGameState->GetScaledSize();
-	// }
 }
 
 // Called every frame

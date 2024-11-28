@@ -39,31 +39,27 @@ void AMyGameState::LoadConfig()
 		// 注意判断FJsonObject是否有效
 		if (FJsonSerializer::Deserialize(JsonReader, JsonObject) && JsonObject.IsValid())
 		{
-			// 从这里开始，按照树形结构，逐层提取json信息
+			/* 3. 从这里开始，按照树形结构，逐层提取json信息 */
 			// 首先用 HasField() 判断是否存在某属性，如存在再用 GetXXXField() 提取该属性的值；
 			if (JsonObject->HasField(TEXT("RemainingGameTime")))
 			{
 				RemainingGameTime = JsonObject->GetNumberField(TEXT("RemainingGameTime"));
 			}
-			UE_LOG(LogTemp, Warning, TEXT("RemainingGameTime is: %f"), RemainingGameTime);
 
 			if (JsonObject->HasField(TEXT("RemainingSpecialCube")))
 			{
 				RemainingSpecialCube = JsonObject->GetNumberField(TEXT("RemainingSpecialCube"));
 			}
-			UE_LOG(LogTemp, Warning, TEXT("RemainingSpecialCube is: %d"), RemainingSpecialCube);
 
 			if (JsonObject->HasField(TEXT("HitScore")))
 			{
 				HitScore = JsonObject->GetNumberField(TEXT("HitScore"));
 			}
-			UE_LOG(LogTemp, Warning, TEXT("HitScore is: %d"), HitScore);
 
 			if (JsonObject->HasField(TEXT("ScaledSize")))
 			{
 				ScaledSize = JsonObject->GetNumberField(TEXT("ScaledSize"));
 			}
-			UE_LOG(LogTemp, Warning, TEXT("ScaledSize is: %f"), ScaledSize);
 
 			if (JsonObject->HasField(TEXT("CubeSpawnRange")))
 			{
@@ -184,3 +180,7 @@ void AMyGameState::OnRep_RemainingSpecialCube() const
 	OnSpecialCubeUpdated.Broadcast(RemainingSpecialCube);
 }
 
+void AMyGameState::MulticastEndGame_Implementation()
+{
+	OnGameEnd.Broadcast();
+}
