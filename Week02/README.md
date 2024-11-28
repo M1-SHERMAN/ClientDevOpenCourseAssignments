@@ -2,6 +2,22 @@
 
 ![VideoLink](Video/Week02Video.mp4)
 
+## 作业要求
+
+基于FirstPerson示例，实现一个demo，具备以下功能：
+
+（X、Y、N、T这些内容表示可以配置）
+1. 规则
+    1. 射击命中方块，获得积分X分
+    2. 方块被子弹击中后，缩放为Y倍，再次被命中后销毁
+2. 流程
+    1. 游戏开始时随机N个方块成为重要目标，射击命中后获得双倍积分
+    2. 游戏开始后限时T秒，时间到后游戏结算，打印日志输出每个玩家获得的积分和所有玩家获得的总积分
+3. 附加题
+    1. 利用UMG制作结算UI替代日志打印
+    2. 支持多人联机
+
+
 # 学习笔记 & 思路整理
 
 特别鸣谢：Claude
@@ -31,7 +47,7 @@
 ## 各个类的协同
 
 ```plain text
-游戏开始
+	     游戏开始
 		↓
 GameMode、GameState初始化（加载配置、设置游戏规则）
 		↓
@@ -63,19 +79,19 @@ GameMode、GameState初始化（加载配置、设置游戏规则）
 
    ```plain text
    客户端 Projectile::OnHit()
-   				↓
+   		↓
    检查目标是否实现了IScorable接口
-   				↓
+   		↓
    调用IScorable::HandleHitEvent()
-   				↓
+   		↓
    Character::ServerReportHit() [Client -> Server RPC]
-   				↓
+   		↓
    服务器端 ShootingCubeBase::ServerHandleHitEvent()
-   				↓
+   		↓
    更新命中计数，调整大小
-   				↓
+   		↓
    通过GameMode添加分数
-   				↓
+   		↓
    GameState更新并复制新的分数到所有客户端
    ```
 
