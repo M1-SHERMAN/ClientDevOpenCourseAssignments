@@ -1,13 +1,13 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "GameEndWidget.h"
+#include "GameOverWidget.h"
 
 #include "Components/ScrollBox.h"
 #include "Components/TextBlock.h"
 #include "Components/VerticalBox.h"
 
-void UGameEndWidget::NativeConstruct()
+void UGameOverWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
 
@@ -15,12 +15,12 @@ void UGameEndWidget::NativeConstruct()
 	UpdateScoreBoard();
 }
 
-void UGameEndWidget::NativeDestruct()
+void UGameOverWidget::NativeDestruct()
 {
 	Super::NativeDestruct();
 }
 
-AMyGameState* UGameEndWidget::GetGameState() const
+AMyGameState* UGameOverWidget::GetGameState() const
 {
 	if (const UWorld* World = GetWorld())
 	{
@@ -29,7 +29,7 @@ AMyGameState* UGameEndWidget::GetGameState() const
 	return nullptr;
 }
 
-void UGameEndWidget::UpdateScoreBoard()
+void UGameOverWidget::UpdateScoreBoard()
 {
 	if (!ScoreBoard)
 	{
@@ -63,7 +63,7 @@ void UGameEndWidget::UpdateScoreBoard()
 
 #if WITH_EDITOR
 
-void UGameEndWidget::NativePreConstruct()
+void UGameOverWidget::NativePreConstruct()
 {
 	Super::NativePreConstruct();
 

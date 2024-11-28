@@ -10,7 +10,7 @@
 
 class UBoxComponent;
 
-UCLASS()
+UCLASS(Blueprintable, ClassGroup=(Cube))
 class UELEARNPROJECT_API AShootingCubeBase : public AActor, public IScorable
 {
 	GENERATED_BODY()
@@ -35,11 +35,12 @@ protected:
 	UPROPERTY(ReplicatedUsing = OnRep_HitCounter, BlueprintReadOnly, Category="Scores")
 	int HitCounter = 0;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Scores")
-	int HitScore = 1;
+	// HitScore和ScaledSize只会在GameMode中，当Cube被实际生成时才进行设置
+	UPROPERTY(Replicated, BlueprintReadOnly, Category="Scores")
+	int HitScore;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Scores")
-	float ScaledSize = 1.5f;
+	UPROPERTY(Replicated, BlueprintReadOnly, Category="Scores")
+	float ScaledSize;
 
 protected:
 	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
@@ -51,11 +52,11 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	virtual int GetScoreValue() const override;
-
 	virtual void HandleHitEvent(AController* PlayerController) override;
 	
 	UFUNCTION(Server, Reliable)
 	void ServerHandleHitEvent(AController* InstigatorController);
 
+	void SetHitScore(int NewHitScore) { HitScore = NewHitScore; }
+	void SetScaledSize(float NewScaledSize) { ScaledSize = NewScaledSize; }
 };

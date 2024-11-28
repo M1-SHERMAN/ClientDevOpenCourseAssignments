@@ -16,10 +16,6 @@ AUELearnProjectGameMode::AUELearnProjectGameMode()
 	// set default pawn class to our Blueprinted character
 	static ConstructorHelpers::FClassFinder<APawn> PlayerPawnClassFinder(TEXT("/Game/FirstPerson/Blueprints/BP_FirstPersonCharacter"));
 	DefaultPawnClass = PlayerPawnClassFinder.Class;
-	
-	GameStateClass = AMyGameState::StaticClass();
-	GameDuration = GameStateClass->GetDefaultObject<AMyGameState>()->GetRemainingGameTime();
-	CubeSpawnRange = GameStateClass->GetDefaultObject<AMyGameState>()->GetCubeSpawnRange();
 
 	
 	if (NormalCubeClass == nullptr)
@@ -42,7 +38,11 @@ void AUELearnProjectGameMode::BeginPlay()
 	{
 		if (AMyGameState* MyGameState = GetGameState<AMyGameState>())
 		{
-			MyGameState->SetRemainingGameTime(GameDuration);
+			CubeSpawnRange = MyGameState->GetCubeSpawnRange();
+			RemainingSpecialCubeNumber = MyGameState->GetRemainingSpecialCube();
+			
+			MyGameState->SetRemainingGameTime(MyGameState->GetRemainingGameTime());
+
 			GetWorld()->GetTimerManager().SetTimer(
 													GameTimerHandle,
 													this,
@@ -76,12 +76,15 @@ void AUELearnProjectGameMode::GenerateCubes()
 {
 	TArray<AActor*> TargetPoints;
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ATargetPoint::StaticClass(), TargetPoints);
-
+	
+	
 	for (AActor* TargetPoint : TargetPoints)
 	{
 		if (AMyGameState* MyGameState = GetGameState<AMyGameState>())
 		{
-			if (ATargetPoint* TargetPointCasted = Cast<ATargetPoint>(TargetPoint))
+			int ScoreToAdd = MyGameState->GetHitScore();
+			const float ScaledSize = MyGameState->GetScaledSize();
+			if (const ATargetPoint* TargetPointCasted = Cast<ATargetPoint>(TargetPoint))
 			{
 				const int CurrentRemainingSpecialCubeNumber = MyGameState->GetRemainingSpecialCube();
 				TSubclassOf<AShootingCubeBase> CubeClass;
@@ -91,41 +94,23 @@ void AUELearnProjectGameMode::GenerateCubes()
 					if (CubeClass == SpecialCubeClass)
 					{
 						MyGameState->SetRemainingSpecialCube(CurrentRemainingSpecialCubeNumber - 1);
+						ScoreToAdd *= 2;
 					}
 				}
 				else
 				{
 					CubeClass = NormalCubeClass;
 				}
-
-				// if (CubeClass == SpecialCubeClass)
-				// {
-				// 	if ( RemainingSpecialCubeNumber <= 0)
-				// 	{
-				// 		UE_LOG(LogTemp, Warning, TEXT("No more special cubes!"));
-				// 		continue;
-				// 	}
-				// 	else
-				// 	{
-				// 		UE_LOG(LogTemp, Warning, TEXT("Decreasing special cubes Number"));
-				// 		GameStateClass->GetDefaultObject<AMyGameState>()->SetRemainingSpecialCube(--RemainingSpecialCubeNumber);
-				// 	}
-				// }
-				
-				// FVector Location = TargetPoint->GetActorLocation();
-				// Location.Y += FMath::RandRange(-100.0f, 100.0f);
-				// Location.Z += FMath::RandRange(-100.0f, 100.0f);
-
 				FVector Location;
 				bool bLocationSpawned = false;
 				while (!bLocationSpawned)
 				{
-					Location = TargetPoint->GetActorLocation();
+					Location = TargetPointCasted->GetActorLocation();
 					Location.Y += FMath::RandRange(-CubeSpawnRange.Y, CubeSpawnRange.Y);
 					Location.Z += FMath::RandRange(-CubeSpawnRange.Z, CubeSpawnRange.Z);
 
 					FCollisionQueryParams QueryParams;
-					QueryParams.AddIgnoredActor(TargetPoint);
+					QueryParams.AddIgnoredActor(TargetPointCasted);
 
 					bLocationSpawned = !GetWorld()->OverlapAnyTestByChannel(
 						Location,
@@ -135,9 +120,12 @@ void AUELearnProjectGameMode::GenerateCubes()
 							QueryParams);
 				}
 				
-				FRotator Rotation = TargetPoint->GetActorRotation();
-				GetWorld()->SpawnActor<AShootingCubeBase>(CubeClass, Location, Rotation);
-				
+				FRotator Rotation = TargetPointCasted->GetActorRotation();
+				if (AShootingCubeBase* SpawnedCube = GetWorld()->SpawnActor<AShootingCubeBase>(CubeClass, Location, Rotation))
+				{
+					SpawnedCube->SetHitScore(ScoreToAdd);
+					SpawnedCube->SetScaledSize(ScaledSize);
+				}
 			}
 		}
 

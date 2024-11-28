@@ -4,6 +4,8 @@
 
 #include "UELearnProjectCharacter.h"
 #include "UELearnProjectGameMode.h"
+
+#include "Engine/Engine.h"
 #include "Net/UnrealNetwork.h"
 #include "Components/BoxComponent.h"
 
@@ -34,6 +36,12 @@ AShootingCubeBase::AShootingCubeBase()
 		CubeMesh->SetMaterial(0, CubeMaterialAsset.Object);
 	}
 
+	// if (const UClass* MyGameState = AMyGameState::StaticClass())
+	// {
+	// 	HitScore = MyGameState->GetDefaultObject<AMyGameState>()->GetHitScore();
+	// 	ScaledSize = MyGameState->GetDefaultObject<AMyGameState>()->GetScaledSize();
+	// }
+
 	bReplicates = true;
 }
 
@@ -41,7 +49,12 @@ AShootingCubeBase::AShootingCubeBase()
 void AShootingCubeBase::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
+	// if (const AMyGameState* MyGameState = GetWorld()->GetGameStateChecked<AMyGameState>())
+	// {
+	// 	HitScore = MyGameState->GetHitScore();
+	// 	ScaledSize = MyGameState->GetScaledSize();
+	// }
 }
 
 // Called every frame
@@ -55,11 +68,9 @@ void AShootingCubeBase::GetLifetimeReplicatedProps(TArray<class FLifetimePropert
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	DOREPLIFETIME(AShootingCubeBase, HitCounter);
-}
-
-int AShootingCubeBase::GetScoreValue() const
-{
-	return HitScore;
+	DOREPLIFETIME(AShootingCubeBase, HitScore);
+	DOREPLIFETIME(AShootingCubeBase, ScaledSize);
+	
 }
 
 void AShootingCubeBase::HandleHitEvent(AController* InstigatorController)
@@ -87,7 +98,7 @@ void AShootingCubeBase::ServerHandleHitEvent_Implementation(AController* Instiga
 		
 		if (AUELearnProjectGameMode* GameMode = Cast<AUELearnProjectGameMode>(GetWorld()->GetAuthGameMode()))
 		{
-			const int ScoreToAdd = GetScoreValue();
+			const int ScoreToAdd = HitScore;
 			GameMode->AddScore(InstigatorController, ScoreToAdd);
 
 		}
@@ -97,11 +108,10 @@ void AShootingCubeBase::ServerHandleHitEvent_Implementation(AController* Instiga
 		
 		if (AUELearnProjectGameMode* GameMode = Cast<AUELearnProjectGameMode>(GetWorld()->GetAuthGameMode()))
 		{
-			const int ScoreToAdd = GetScoreValue();
+			const int ScoreToAdd = HitScore;
 			GameMode->AddScore(InstigatorController, ScoreToAdd);
+			Destroy();
 		}
-		
-		Destroy();
 	}
 }
 

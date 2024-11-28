@@ -7,13 +7,13 @@
 
 #include "MyGameState.h"
 
-#include "GameEndWidget.generated.h"
+#include "GameOverWidget.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class UELEARNPROJECT_API UGameEndWidget : public UUserWidget
+class UELEARNPROJECT_API UGameOverWidget : public UUserWidget
 {
 	GENERATED_BODY()
 	
