@@ -1,4 +1,4 @@
-# 第二周作业：学习笔记 & 思路总结
+ # 第二周作业：学习笔记 & 思路总结
 
 ![VideoLink](Video/Week02Video.mp4)
 
@@ -498,35 +498,44 @@ FOnTimeUpdated OnTimeUpdated;
 
     这就像要数 60 秒，你可以看 60 次手表，也可以一直盯着手表看——显然前者更有效率。
 
-2.  时间更新的具体实现：`UpdateGameTime()` - **服务器权威性检查**
-    `cpp
-      if (!HasAuthority()) return;
-      `
-    这行代码确保时间只在服务器上更新。类似一个足球比赛，只有裁判（服务器）能决定正式时间，球员（客户端）只能查看时间。 - **时间更新和同步**
-    `cpp
-      RemainingGameTime = MyGameState->GetRemainingGameTime() - 1.0f;
-      MyGameState->SetRemainingGameTime(RemainingGameTime);
-      `
-    这里通过 GameState 进行时间更新。在 GameState 中：
-    `cpp
-      void AMyGameState::SetRemainingGameTime(float NewTime)
-      {
+2.  时间更新的具体实现：`UpdateGameTime()`
+    - **服务器权威性检查**
+	
+  	  ```cpp
+    	  if (!HasAuthority()) return;
+   	  ```
+ 	  确保时间只在服务器上更新。
+   
+    - **时间更新和同步**
+
+        ```cpp
+        RemainingGameTime = MyGameState->GetRemainingGameTime() - 1.0f;
+        MyGameState->SetRemainingGameTime(RemainingGameTime);
+        ```
+        这里通过 GameState 进行时间更新。在 GameState 中：
+
+        ```cpp
+        void AMyGameState::SetRemainingGameTime(float NewTime)
+        {
           if (HasAuthority())
           {
-              RemainingGameTime = NewTime;
-              OnTimeUpdated.Broadcast(RemainingGameTime);
+             RemainingGameTime = NewTime;
+             OnTimeUpdated.Broadcast(RemainingGameTime);
           }
-      }
-      `
-    当时间更新时，会触发`OnTimUpdated`事件，任何关心时间变化的系统都可以监听这个事件。 - **游戏结束处理**
-    当时间用尽时，使用 Multicast RPC 确保所有客户端同时收到游戏结束的消息。
-    `cpp
-if (RemainingGameTime <= 0.0f)
-{
-    MyGameState->MulticastEndGame();
-    GetWorld()->GetTimerManager().ClearTimer(GameTimerHandle);
-}
-`
+        }
+        ```
+        当时间更新时，会触发`OnTimUpdated`事件，任何关心时间变化的系统都可以监听这个事件。
+	
+    - **游戏结束处理**
+	
+        当时间用尽时，使用 Multicast RPC 确保所有客户端同时收到游戏结束的消息。
+        ```cpp
+        if (RemainingGameTime <= 0.0f)
+        {
+            MyGameState->MulticastEndGame();
+            GetWorld()->GetTimerManager().ClearTimer(GameTimerHandle);
+        }
+        ```
 
 ### 时间变化的响应
 
