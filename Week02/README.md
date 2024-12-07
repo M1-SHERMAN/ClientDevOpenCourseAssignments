@@ -735,27 +735,6 @@ UI 的管理主要集中在 MyPlayerController 当中：
    }
    ```
 
-为什么使用 PlayerController 而不是 HUD 来管理 UI？
-
-AHUD 是一个专门用于处理平视显示器（Heads-Up Display）的类，它继承自 AActor。在早期的 UE 版本中，AHUD 主要用于在屏幕上直接绘制内容，如使用 DrawText()、DrawTexture()等方法进行 2D 渲染。
-
-与 PlayerController 中管理 UI 相比，这两种方式各有优势：
-
-**使用 AHUD 的优势：**
-
-1. 专门的职责划分 - AHUD 类的设计初衷就是处理游戏的 UI 展示
-2. 直接的 2D 绘制功能 - 对于需要直接在屏幕上绘制的内容（如准星、简单文字提示）非常方便
-3. 性能优势 - 对于简单的 UI 元素，直接绘制比创建 Widget 可能更高效
-
-**使用 PlayerController 管理 UMG 的优势：**
-
-1. 更现代的 UI 解决方案 - UMG（Unreal Motion Graphics）提供了更强大的 UI 设计功能
-2. 更好的设计工具支持 - 可以在编辑器中可视化设计 UI
-3. 更容易实现复杂的交互 - UMG 提供了丰富的交互组件和动画系统
-4. 更好的事件处理能力 - PlayerController 自然地连接了游戏逻辑和 UI 交互
-
-简而言之：复杂的用 PlayerController + UMG，简单的用 HUD
-
 ## 具体 UI 的设计
 
 ### WBP_GameHUD
